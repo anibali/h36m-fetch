@@ -70,11 +70,6 @@ def download_all():
 
         download_file(BASE_URL + '?' + query, out_file)
 
-        checksums[out_file] = md5(out_file)
-        with open('checksums.txt', 'w') as f:
-            for k, v in checksums.items():
-                f.write('{}  {}\n'.format(v, k))
-
 
 if __name__ == '__main__':
     download_all()

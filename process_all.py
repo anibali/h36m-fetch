@@ -11,8 +11,15 @@ from itertools import product
 from tqdm import tqdm
 
 
-# subjects = ['S1', 'S5', 'S6', 'S7', 'S8', 'S9', 'S11']
-subjects = ['S1', 'S5']
+subjects = {
+    'S1': 1,
+    'S5': 5,
+    'S6': 6,
+    'S7': 7,
+    'S8': 8,
+    'S9': 9,
+    'S11': 11,
+}
 actions = {
     'Directions': 1,
     'Discussion': 2,
@@ -104,11 +111,13 @@ def process_view(subject, action, camera):
                 )
 
     return {
-        'pose/2d': poses_2d,
-        'pose/3d-univ': poses_3d,
+        'pose/2d': poses_2d[::5],
+        'pose/3d-univ': poses_3d[::5],
         'intrinsics/' + camera: np.array([alpha_x, x_0, alpha_y, y_0]),
-        'camera': np.array(int(camera)).repeat(len(poses_3d), axis=0),
         'frame': frames,
+        'camera': np.full(frames.shape, int(camera)),
+        'subject': np.full(frames.shape, subjects[subject]),
+        'action': np.full(frames.shape, actions[action]),
     }
 
 
@@ -123,9 +132,14 @@ def process_sequence(subject, action):
             continue
         for k, v in annots.items():
             if k in datasets:
-                datasets[k] = np.concatenate([datasets[k], v])
+                datasets[k].append(v)
             else:
-                datasets[k] = v
+                datasets[k] = [v]
+
+    if len(datasets) == 0:
+        return
+
+    datasets = {k: np.concatenate(v) for k, v in datasets.items()}
 
     out_dir = path.join('processed', subject, action)
     makedirs(out_dir, exist_ok=True)
@@ -135,7 +149,7 @@ def process_sequence(subject, action):
 
 
 def process_all():
-    for subject, action in tqdm(list(product(subjects, actions)), ascii=True, leave=False):
+    for subject, action in tqdm(list(product(subjects.keys(), actions.keys())), ascii=True, leave=False):
         process_sequence(subject, action)
 
 
