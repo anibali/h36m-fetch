@@ -11,6 +11,13 @@ extract, and preprocess the images and annotations from Human 3.6M.
 * `axel`
 * CDF
 
+Alternatively, a Dockerfile is provided which has all of the
+requirements set up. You can use it to run scripts like so:
+
+```bash
+$ docker-compose run --rm --user="$(id -u):$(id -g)" main <script>
+```
+
 ## Usage
 
 1. Firstly, you will need to create an account at

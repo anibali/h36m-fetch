@@ -1,0 +1,11 @@
+version: '2.3'
+services:
+  main:
+    build: .
+    volumes:
+      - .:/app
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PYTHONIOENCODING=utf_8
+    init: true
+    network_mode: host

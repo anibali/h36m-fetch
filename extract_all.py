@@ -2,6 +2,7 @@
 
 from os import path, makedirs
 import tarfile
+from tqdm import tqdm
 
 
 subjects = ['S1', 'S5', 'S6', 'S7', 'S8', 'S9', 'S11']
@@ -30,7 +31,7 @@ def extract_tgz(tgz_file, dest):
 
 
 def extract_all():
-  for subject_id in subjects:
+  for subject_id in tqdm(subjects, ascii=True):
       out_dir = path.join('extracted', subject_id)
       makedirs(out_dir, exist_ok=True)
       extract_tgz('archives/Poses_D2_Positions_{}.tgz'.format(subject_id),

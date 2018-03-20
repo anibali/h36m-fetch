@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 
 # subjects = ['S1', 'S5', 'S6', 'S7', 'S8', 'S9', 'S11']
-subjects = ['S1']
+subjects = ['S1', 'S5']
 actions = {
     'Directions': 1,
     'Discussion': 2,
@@ -40,10 +40,11 @@ cameras = {
 
 def process_view(subject, action, camera):
     subj_dir = path.join('extracted', subject)
-    if action == 'Sitting':
-        act_cam = '.'.join([action + ' 1', camera])
-    else:
-        act_cam = '.'.join([action, camera])
+    act_cam = '.'.join([action, camera])
+    for i in range(1, 100):
+        if path.isfile(path.join(subj_dir, 'Poses_D2_Positions', act_cam + '.cdf')):
+            break
+        act_cam = '{} {:d}.{}'.format(action, i, camera)
 
     with pycdf.CDF(path.join(subj_dir, 'Poses_D2_Positions', act_cam + '.cdf')) as cdf:
         poses_2d = np.array(cdf['Pose'])
