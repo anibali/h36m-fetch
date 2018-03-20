@@ -38,13 +38,23 @@ cameras = {
 }
 
 
+class MissingDataException(Exception):
+    pass
+
+
 def process_view(subject, action, camera):
     subj_dir = path.join('extracted', subject)
     act_cam = '.'.join([action, camera])
+
+    file_found = False
     for i in range(1, 100):
         if path.isfile(path.join(subj_dir, 'Poses_D2_Positions', act_cam + '.cdf')):
+            file_found = True
             break
         act_cam = '{} {:d}.{}'.format(action, i, camera)
+
+    if not file_found:
+        raise MissingDataException('missing data for {}/{}.{}'.format(subject, action, camera))
 
     with pycdf.CDF(path.join(subj_dir, 'Poses_D2_Positions', act_cam + '.cdf')) as cdf:
         poses_2d = np.array(cdf['Pose'])
@@ -106,7 +116,11 @@ def process_sequence(subject, action):
     datasets = {}
 
     for camera in tqdm(list(sorted(cameras.keys())), ascii=True, leave=False):
-        annots = process_view(subject, action, camera)
+        try:
+            annots = process_view(subject, action, camera)
+        except MissingDataException as ex:
+            print(str(ex))
+            continue
         for k, v in annots.items():
             if k in datasets:
                 datasets[k] = np.concatenate([datasets[k], v])
