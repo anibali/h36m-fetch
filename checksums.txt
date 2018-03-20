@@ -1,0 +1,8 @@
+69e038858ace96ba5f6c5ccea52e95e8  archives/Poses_D2_Positions_S1.tgz
+7ac8c4830468a1ed3464076ee9603632  archives/Poses_D2_Positions_S5.tgz
+3c75f06fdf3c4f3b8fb1f8f11d18a10e  archives/Poses_D3_Positions_mono_universal_S1.tgz
+d517e6c0b1112427b2a39fcbd732281c  archives/Videos_S1.tgz
+a0c821f5501fcc450e28c38e5ebd0c17  archives/Poses_D3_Positions_mono_universal_S5.tgz
+02ef041813c3a37b137f86df24419e5a  archives/Videos_S5.tgz
+5f9706d5259f648cca802c069dec9681  archives/Poses_D2_Positions_S6.tgz
+dce0fb2f44b487b2bd36f603d1ff894a  archives/Poses_D3_Positions_mono_universal_S6.tgz
