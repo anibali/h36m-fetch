@@ -60,6 +60,10 @@ def process_view(subject, action, camera):
             break
         act_cam = '{} {:d}.{}'.format(action, i, camera)
 
+    # Workaround for corrupt video file
+    if subject == 'S11' and action == 'Directions' and camera == '54138969':
+        act_cam = 'Directions 1.54138969'
+
     if not file_found:
         raise MissingDataException('missing data for {}/{}.{}'.format(subject, action, camera))
 
