@@ -49,6 +49,29 @@ class MissingDataException(Exception):
     pass
 
 
+def select_frame_indices_to_include(subject, poses_3d):
+    # To process every single frame, uncomment the following line:
+    # return np.arange(0, len(poses_3d))
+
+    # Take every 64th frame for the protocol #2 test subjects
+    # (see the "Compositional Human Pose Regression" paper)
+    if subject == 'S9' or subject == 'S11':
+        return np.arange(0, len(poses_3d), 64)
+
+    # Take only frames where movement has occurred for the protocol #2 train subjects
+    frame_indices = []
+    prev_joints3d = None
+    threshold = 200 ** 2  # Require a joint to move at least 200mm since the previous pose
+    for i, joints3d in enumerate(poses_3d):
+        if prev_joints3d is not None:
+            max_move = ((joints3d - prev_joints3d) ** 2).sum(axis=-1).max()
+            if max_move < threshold:
+                continue
+        prev_joints3d = joints3d
+        frame_indices.append(i)
+    return np.array(frame_indices)
+
+
 def process_view(subject, action, camera):
     subj_dir = path.join('extracted', subject)
     act_cam = '.'.join([action, camera])
@@ -84,7 +107,8 @@ def process_view(subject, action, camera):
     y2d = (pose2d[:, 1] * pose3d[:, 2])
     alpha_y, y_0 = list(np.linalg.lstsq(y3d, y2d, rcond=-1)[0].flatten())
 
-    frames = np.arange(0, len(poses_3d), 5) + 1
+    frame_indices = select_frame_indices_to_include(subject, poses_3d)
+    frames = frame_indices + 1
     video_file = path.join(subj_dir, 'Videos', act_cam + '.mp4')
     frames_dir = path.join('processed', subject, action, 'imageSequence', camera)
     makedirs(frames_dir, exist_ok=True)
@@ -115,8 +139,8 @@ def process_view(subject, action, camera):
                 )
 
     return {
-        'pose/2d': poses_2d[::5],
-        'pose/3d-univ': poses_3d[::5],
+        'pose/2d': poses_2d[frame_indices],
+        'pose/3d-univ': poses_3d[frame_indices],
         'intrinsics/' + camera: np.array([alpha_x, x_0, alpha_y, y_0]),
         'frame': frames,
         'camera': np.full(frames.shape, int(camera)),

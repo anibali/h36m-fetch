@@ -31,6 +31,19 @@ $ docker-compose run --rm --user="$(id -u):$(id -g)" main python3 <script>
    `process_all.py` to preprocess the dataset into an easier to use
    format.
 
+## Frame sampling
+
+Not all frames are selected during the preprocessing step. We assume
+that the data will be used in the Protocol #2 setup (see
+["Compositional Human Pose Regression"](https://arxiv.org/abs/1704.00159)),
+so for subjects S9 and S11 every 64th frame is used. For the training
+subjects (S1, S5, S6, S7, and S8), only "interesting" frames are used.
+That is, near-duplicate frames during periods of low movement are
+skipped.
+
+You can edit `select_frame_indices_to_include()` in `process_all.py` to
+change this behaviour.
+
 ## License
 
 The code in this repository is licensed under the terms of the
