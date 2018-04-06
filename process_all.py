@@ -61,7 +61,7 @@ def select_frame_indices_to_include(subject, poses_3d):
     # Take only frames where movement has occurred for the protocol #2 train subjects
     frame_indices = []
     prev_joints3d = None
-    threshold = 200 ** 2  # Require a joint to move at least 200mm since the previous pose
+    threshold = 40 ** 2  # Skip frames until at least one joint has moved by 40mm
     for i, joints3d in enumerate(poses_3d):
         if prev_joints3d is not None:
             max_move = ((joints3d - prev_joints3d) ** 2).sum(axis=-1).max()
