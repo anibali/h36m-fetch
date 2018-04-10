@@ -49,20 +49,20 @@ class MissingDataException(Exception):
     pass
 
 
-def select_frame_indices_to_include(subject, poses_3d):
+def select_frame_indices_to_include(subject, poses_3d_univ):
     # To process every single frame, uncomment the following line:
-    # return np.arange(0, len(poses_3d))
+    # return np.arange(0, len(poses_3d_univ))
 
     # Take every 64th frame for the protocol #2 test subjects
     # (see the "Compositional Human Pose Regression" paper)
     if subject == 'S9' or subject == 'S11':
-        return np.arange(0, len(poses_3d), 64)
+        return np.arange(0, len(poses_3d_univ), 64)
 
     # Take only frames where movement has occurred for the protocol #2 train subjects
     frame_indices = []
     prev_joints3d = None
     threshold = 40 ** 2  # Skip frames until at least one joint has moved by 40mm
-    for i, joints3d in enumerate(poses_3d):
+    for i, joints3d in enumerate(poses_3d_univ):
         if prev_joints3d is not None:
             max_move = ((joints3d - prev_joints3d) ** 2).sum(axis=-1).max()
             if max_move < threshold:
@@ -70,6 +70,18 @@ def select_frame_indices_to_include(subject, poses_3d):
         prev_joints3d = joints3d
         frame_indices.append(i)
     return np.array(frame_indices)
+
+
+def infer_camera_intrinsics(points2d, points3d):
+    pose2d = points2d.reshape(-1, 2)
+    pose3d = points3d.reshape(-1, 3)
+    x3d = np.stack([pose3d[:, 0], pose3d[:, 2]], axis=-1)
+    x2d = (pose2d[:, 0] * pose3d[:, 2])
+    alpha_x, x_0 = list(np.linalg.lstsq(x3d, x2d, rcond=-1)[0].flatten())
+    y3d = np.stack([pose3d[:, 1], pose3d[:, 2]], axis=-1)
+    y2d = (pose2d[:, 1] * pose3d[:, 2])
+    alpha_y, y_0 = list(np.linalg.lstsq(y3d, y2d, rcond=-1)[0].flatten())
+    return np.array([alpha_x, x_0, alpha_y, y_0])
 
 
 def process_view(subject, action, camera):
@@ -94,20 +106,17 @@ def process_view(subject, action, camera):
         poses_2d = np.array(cdf['Pose'])
         poses_2d = poses_2d.reshape(poses_2d.shape[1], 32, 2)
     with pycdf.CDF(path.join(subj_dir, 'Poses_D3_Positions_mono_universal', act_cam + '.cdf')) as cdf:
+        poses_3d_univ = np.array(cdf['Pose'])
+        poses_3d_univ = poses_3d_univ.reshape(poses_3d_univ.shape[1], 32, 3)
+    with pycdf.CDF(path.join(subj_dir, 'Poses_D3_Positions_mono', act_cam + '.cdf')) as cdf:
         poses_3d = np.array(cdf['Pose'])
         poses_3d = poses_3d.reshape(poses_3d.shape[1], 32, 3)
 
     # Infer camera intrinsics
-    pose2d = poses_2d.reshape(len(poses_2d) * 32, 2)
-    pose3d = poses_3d.reshape(len(poses_3d) * 32, 3)
-    x3d = np.stack([pose3d[:, 0], pose3d[:, 2]], axis=-1)
-    x2d = (pose2d[:, 0] * pose3d[:, 2])
-    alpha_x, x_0 = list(np.linalg.lstsq(x3d, x2d, rcond=-1)[0].flatten())
-    y3d = np.stack([pose3d[:, 1], pose3d[:, 2]], axis=-1)
-    y2d = (pose2d[:, 1] * pose3d[:, 2])
-    alpha_y, y_0 = list(np.linalg.lstsq(y3d, y2d, rcond=-1)[0].flatten())
+    camera_int = infer_camera_intrinsics(poses_2d, poses_3d)
+    camera_int_univ = infer_camera_intrinsics(poses_2d, poses_3d_univ)
 
-    frame_indices = select_frame_indices_to_include(subject, poses_3d)
+    frame_indices = select_frame_indices_to_include(subject, poses_3d_univ)
     frames = frame_indices + 1
     video_file = path.join(subj_dir, 'Videos', act_cam + '.mp4')
     frames_dir = path.join('processed', subject, action, 'imageSequence', camera)
@@ -140,8 +149,10 @@ def process_view(subject, action, camera):
 
     return {
         'pose/2d': poses_2d[frame_indices],
-        'pose/3d-univ': poses_3d[frame_indices],
-        'intrinsics/' + camera: np.array([alpha_x, x_0, alpha_y, y_0]),
+        'pose/3d-univ': poses_3d_univ[frame_indices],
+        'pose/3d': poses_3d[frame_indices],
+        'intrinsics/' + camera: camera_int,
+        'intrinsics-univ/' + camera: camera_int_univ,
         'frame': frames,
         'camera': np.full(frames.shape, int(camera)),
         'subject': np.full(frames.shape, subjects[subject]),

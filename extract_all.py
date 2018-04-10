@@ -36,6 +36,8 @@ def extract_all():
       makedirs(out_dir, exist_ok=True)
       extract_tgz('archives/Poses_D2_Positions_{}.tgz'.format(subject_id),
                   path.join(out_dir, 'Poses_D2_Positions'))
+      extract_tgz('archives/Poses_D3_Positions_mono_{}.tgz'.format(subject_id),
+                  path.join(out_dir, 'Poses_D3_Positions_mono')),
       extract_tgz('archives/Poses_D3_Positions_mono_universal_{}.tgz'.format(subject_id),
                   path.join(out_dir, 'Poses_D3_Positions_mono_universal')),
       extract_tgz('archives/Videos_{}.tgz'.format(subject_id),
