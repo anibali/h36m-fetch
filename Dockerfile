@@ -69,6 +69,9 @@ RUN cd /tmp \
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
+# Create empty SpacePy config (suppresses an annoying warning message)
+RUN mkdir /home/user/.spacepy && echo "[spacepy]" > /home/user/.spacepy/spacepy.rc
+
 # Copy scripts into the image
 COPY --chown=user:user . /app
 
