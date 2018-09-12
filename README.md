@@ -1,9 +1,9 @@
-# Human 3.6M dataset fetcher
+# Human3.6M dataset fetcher
 
-[Human 3.6M](http://vision.imar.ro/human3.6m/description.php) is a 3D
+[Human3.6M](http://vision.imar.ro/human3.6m/description.php) is a 3D
 human pose dataset containing 3.6 million human poses and corresponding
 images. The scripts in this repository make it easy to download,
-extract, and preprocess the images and annotations from Human 3.6M.
+extract, and preprocess the images and annotations from Human3.6M.
 
 ## Requirements
 
@@ -51,5 +51,8 @@ The code in this repository is licensed under the terms of the
 
 Please read the
 [license agreement](http://vision.imar.ro/human3.6m/eula.php) for the
-Human 3.6M dataset itself, which specifies citations you must make when
-using the data in your own research.
+Human3.6M dataset itself, which specifies citations you must make when
+using the data in your own research. The file `metadata.xml` is directly
+copied from the "Visualisation and large scale prediction software"
+bundle from the Human3.6M website, and is subject to the same license
+agreement.
