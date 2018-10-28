@@ -2,3 +2,4 @@ numpy==1.13.3
 tqdm==4.19.8
 h5py==2.7.1
 spacepy==0.1.6
+requests==2.19.1

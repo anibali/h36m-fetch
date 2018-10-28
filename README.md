@@ -8,7 +8,7 @@ extract, and preprocess the images and annotations from Human3.6M.
 ## Requirements
 
 * Python 3
-* `axel`
+* [`axel`](https://github.com/axel-download-accelerator/axel)
 * CDF
 
 Alternatively, a Dockerfile is provided which has all of the
