@@ -1,13 +1,12 @@
+#!/usr/bin/env python3
+
 from subprocess import call
 from os import path, makedirs
 import hashlib
 from tqdm import tqdm
-from configparser import ConfigParser
+import configparser
+import requests
 
-
-config = ConfigParser()
-config.read('config.ini')
-PHPSESSID = config['General']['PHPSESSID']
 
 BASE_URL = 'http://vision.imar.ro/human3.6m/filebrowser.php'
 
@@ -30,16 +29,37 @@ def md5(filename):
     return hash_md5.hexdigest()
 
 
-def download_file(url, dest_file):
+def download_file(url, dest_file, phpsessid):
     call(['axel',
           '-a',
           '-n', '24',
-          '-H', 'COOKIE: PHPSESSID=' + PHPSESSID,
+          '-H', 'COOKIE: PHPSESSID=' + phpsessid,
           '-o', dest_file,
           url])
 
 
-def download_all():
+def get_phpsessid():
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    try:
+        phpsessid = config['General']['PHPSESSID']
+    except (KeyError, configparser.NoSectionError):
+        print('Could not read PHPSESSID from `config.ini`.')
+        phpsessid = input('Enter PHPSESSID: ')
+    return phpsessid
+
+
+def verify_phpsessid(phpsessid):
+    requests.packages.urllib3.disable_warnings()
+    test_url = 'http://vision.imar.ro/human3.6m/filebrowser.php'
+    resp = requests.get(test_url, verify=False, cookies=dict(PHPSESSID=phpsessid))
+    fail_message = 'Failed to verify your PHPSESSID. Please ensure that you ' \
+                   'are currently logged in at http://vision.imar.ro/human3.6m/ ' \
+                   'and that you have copied the PHPSESSID cookie correctly.'
+    assert resp.url == test_url, fail_message
+
+
+def download_all(phpsessid):
     checksums = {}
     with open('checksums.txt', 'r') as f:
         for line in f.read().splitlines(keepends=False):
@@ -72,8 +92,10 @@ def download_all():
             if checksums.get(out_file, None) == checksum:
                 continue
 
-        download_file(BASE_URL + '?' + query, out_file)
+        download_file(BASE_URL + '?' + query, out_file, phpsessid)
 
 
 if __name__ == '__main__':
-    download_all()
+    phpsessid = get_phpsessid()
+    verify_phpsessid(phpsessid)
+    download_all(phpsessid)

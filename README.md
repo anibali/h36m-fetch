@@ -5,10 +5,15 @@ human pose dataset containing 3.6 million human poses and corresponding
 images. The scripts in this repository make it easy to download,
 extract, and preprocess the images and annotations from Human3.6M.
 
+**Please do not ask me for a copy of the Human3.6M dataset. I do not own
+the data, nor do I have permission to redistribute it. Please visit
+http://vision.imar.ro/human3.6m/ in order to request access and contact
+the maintainers of the dataset.**
+
 ## Requirements
 
 * Python 3
-* `axel`
+* [`axel`](https://github.com/axel-download-accelerator/axel)
 * CDF
 
 Alternatively, a Dockerfile is provided which has all of the
