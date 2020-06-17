@@ -15,6 +15,7 @@ the maintainers of the dataset.**
 * Python 3
 * [`axel`](https://github.com/axel-download-accelerator/axel)
 * CDF
+* ffmpeg 3.2.4
 
 Alternatively, a Dockerfile is provided which has all of the
 requirements set up. You can use it to run scripts like so:
