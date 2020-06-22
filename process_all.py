@@ -2,6 +2,7 @@
 
 from os import path, makedirs, listdir
 from shutil import move
+import traceback
 from spacepy import pycdf
 import numpy as np
 import h5py
@@ -150,7 +151,9 @@ def process_subaction(subject, action, subaction):
         try:
             annots = process_view(out_dir, subject, action, subaction, camera)
         except:
-            print('Error processing sequence, skipping: ', repr((subject, action, subaction, camera)))
+            tqdm.write('!!! Error processing sequence, skipping: ' + \
+                       repr((subject, action, subaction, camera)))
+            tqdm.write(traceback.format_exc())
             continue
 
         for k, v in annots.items():
