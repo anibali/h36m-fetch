@@ -24,20 +24,15 @@ USER user
 ENV HOME=/home/user
 RUN chmod 777 /home/user
 
-# Install Miniconda
-RUN curl -so ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-4.4.10-Linux-x86_64.sh \
+# Install Miniconda and Python 3.6
+ENV CONDA_AUTO_UPDATE_CONDA=false
+ENV PATH=/home/user/miniconda/bin:$PATH
+RUN curl -sLo ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-4.4.10-Linux-x86_64.sh \
  && chmod +x ~/miniconda.sh \
  && ~/miniconda.sh -b -p ~/miniconda \
- && rm ~/miniconda.sh
-ENV PATH=/home/user/miniconda/bin:$PATH
-
-# Create a Python 3.6 environment
-RUN /home/user/miniconda/bin/conda install conda-build \
- && /home/user/miniconda/bin/conda create -y --name py36 python=3.6.4 \
- && /home/user/miniconda/bin/conda clean -ya
-ENV CONDA_DEFAULT_ENV=py36
-ENV CONDA_PREFIX=/home/user/miniconda/envs/$CONDA_DEFAULT_ENV
-ENV PATH=$CONDA_PREFIX/bin:$PATH
+ && rm ~/miniconda.sh \
+ && conda install -y python==3.6.4 \
+ && conda clean -ya
 
 # Ensure conda version is at least 4.4.11
 # (because of this issue: https://github.com/conda/conda/issues/6811)
@@ -49,7 +44,7 @@ RUN conda install --no-update-deps -y -c conda-forge ffmpeg=3.2.4 \
  && conda clean -ya
 
 # Install NumPy
-RUN conda install --no-update-deps -y numpy=1.13.3 \
+RUN conda install --no-update-deps -y numpy=1.14.5 \
  && conda clean -ya
 
 # Install build tools
@@ -59,11 +54,13 @@ RUN sudo apt-get update \
 
 # Build and install CDF
 RUN cd /tmp \
- && curl -O https://spdf.sci.gsfc.nasa.gov/pub/software/cdf/dist/cdf36_4/linux/cdf36_4-dist-all.tar.gz \
- && tar xzf cdf36_4-dist-all.tar.gz \
- && cd cdf36_4-dist \
+ && curl -sLO https://github.com/anibali/h36m-fetch/releases/download/v0.0.0/cdf38_0-dist-all.tar.gz \
+ && tar xzf cdf38_0-dist-all.tar.gz \
+ && cd cdf38_0-dist \
  && make OS=linux ENV=gnu CURSES=yes FORTRAN=no UCOPTIONS=-O2 SHARED=yes all \
- && sudo make INSTALLDIR=/usr/local/cdf install
+ && sudo make INSTALLDIR=/usr/local/cdf install \
+ && cd .. \
+ && rm -rf cdf38_0-dist
 
 # Install other dependencies from pip
 COPY requirements.txt .
