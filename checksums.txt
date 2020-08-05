@@ -32,4 +32,4 @@ df1fde6b5656729336f54dcd79ab6e47  archives/Poses_D2_Positions_S11.tgz
 729e93d4e50c806f4a55fd1b87e2ff52  archives/Poses_D3_Positions_S11.tgz
 944a8bca62a933f5d630a835868fba23  archives/Poses_D3_Positions_mono_S11.tgz
 c00b5b22ed1b88de5a536433e300503e  archives/Poses_D3_Positions_mono_universal_S11.tgz
-13a24f30eb4e7cc505cbf80410c90ffe  archives/Videos_S11.tgz
+25c25250be8f75d7991dcbf74bb9d339  archives/Videos_S11.tgz
