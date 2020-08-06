@@ -26,11 +26,6 @@ included_subjects = {
     'S11': 11,
 }
 
-# Sequences with known issues
-blacklist = {
-    ('S11', '2', '2', '54138969'),  # Video file is corrupted
-}
-
 
 # Rather than include every frame from every video, we can instead wait for the pose to change
 # significantly before storing a new example.
@@ -145,9 +140,6 @@ def process_subaction(subject, action, subaction):
     makedirs(out_dir, exist_ok=True)
 
     for camera in tqdm(metadata.camera_ids, ascii=True, leave=False):
-        if (subject, action, subaction, camera) in blacklist:
-            continue
-
         try:
             annots = process_view(out_dir, subject, action, subaction, camera)
         except:
