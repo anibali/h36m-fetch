@@ -105,7 +105,7 @@ def process_view(out_dir, subject, action, subaction, camera):
             # Use ffmpeg to extract frames into a temporary directory
             call([
                 'ffmpeg',
-                '-nostats', '-loglevel', '0',
+                '-nostats', '-loglevel', 'error',
                 '-i', video_file,
                 '-qscale:v', '3',
                 path.join(tmp_dir, 'img_%06d.jpg')
