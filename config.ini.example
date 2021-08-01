@@ -1,5 +1,0 @@
-[General]
-
-# Get your PHPSESSID by logging into http://vision.imar.ro/human3.6m/ and inspecting the cookies
-# with your web browser.
-PHPSESSID=xxxxxxxxxxxxxxxxxxxxxxxxxx
